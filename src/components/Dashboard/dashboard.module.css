@@ -1,0 +1,13 @@
+.top {
+    display: flex;
+    width: 80%;
+    height: 25rem;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #01015c;
+}
+
+.top p {
+    font-size: 2.5em;
+    color: #fff;
+}
