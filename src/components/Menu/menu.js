@@ -39,12 +39,12 @@ export default function Menu() {
 					</Link>
 				</div>
 				<div className={styles.navitem}>
-					<Link href="/services">
+					<Link href="/point_de_retrait">
 						<LocationOnIcon />
 						<span>Point de retrait</span>
 					</Link>
 				</div>
-				<div className={styles.navitem}>
+				<div className={styles.submitButton}>
 					<Button
 						type="submit"
 						variant="contained"

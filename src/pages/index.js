@@ -2,9 +2,8 @@ import { parseCookies } from "../helpers/";
 import Head from "next/head";
 import { Inter } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
-import Connexion from "./connexion";
 import Menu from "../components/Menu/menu";
-import TopDashboard from "@/components/Dashboard/topDashboard";
+import TopDashboard from "@/components/TopDashboard/topDashboard";
 
 const inter = Inter({ subsets: ["latin"] });
 

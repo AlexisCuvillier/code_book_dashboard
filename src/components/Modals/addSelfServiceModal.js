@@ -4,20 +4,20 @@ import styles from "./addModal.module.css";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-export default function AddBookModal() {
+export default function AddSelfServiceModal() {
 	const [open, setOpen] = useState(false);
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
-	const [title, setTitle] = useState();
-	const [author, setAuthor] = useState();
-	const [available, setAvailable] = useState(true);
+	const [location, setLocation] = useState();
+	const [address, setAddress] = useState();
+	const [zipCode, setZipCode] = useState();
 
 	const submitForm = async (event) => {
 		event.preventDefault();
 		const data = {
-			title: title,
-			author: author,
-			available: available,
+			location: location,
+			address: address,
+			zip_code: zipCode,
 		};
 		const JSONdata = JSON.stringify(data);
 		const options = {
@@ -29,7 +29,7 @@ export default function AddBookModal() {
 		};
 		const url = `${process.env.API}/api/book`;
 		const response = await fetch(url, options);
-		console.log(`${response} Livre ${title} de l'auteur ${author}`);
+		console.log(`${response} Livre ${location} de l'auteur ${address}`);
 		handleClose();
 	};
 
@@ -37,7 +37,7 @@ export default function AddBookModal() {
 		<div className={styles.addbutton}>
 			<Button onClick={handleOpen} variant="contained" color="secondary">
 				<AddIcon />
-				<span>Ajouter un livre</span>
+				<span>Ajouter un Point de Retrait</span>
 			</Button>
 			<Modal
 				open={open}
@@ -47,31 +47,43 @@ export default function AddBookModal() {
 			>
 				<Box className={styles.modal}>
 					<Typography id="modal-modal-title" variant="h6" component="h2">
-						Nouveau Livre
+						Nouveau Point de retrait
 					</Typography>
 					<TextField
 						className={styles.input}
 						autoFocus
 						required
 						margin="dense"
-						id="title"
+						id="location"
 						label="Titre"
 						type="text"
 						variant="outlined"
-						value={title}
-						onChange={(event) => setTitle(event.target.value)}
+						value={location}
+						onChange={(event) => setLocation(event.target.value)}
 					/>
 					<TextField
 						className={styles.input}
 						autoFocus
 						required
 						margin="dense"
-						id="author"
-						label="Auteur"
+						id="address"
+						label="Adresse"
 						type="text"
 						variant="outlined"
-						value={author}
-						onChange={(event) => setAuthor(event.target.value)}
+						value={address}
+						onChange={(event) => setAddress(event.target.value)}
+					/>
+					<TextField
+						className={styles.input}
+						autoFocus
+						required
+						margin="dense"
+						id="zipCode"
+						label="Code Postal"
+						type="text"
+						variant="outlined"
+						value={zipCode}
+						onChange={(event) => setZipCode(event.target.value)}
 					/>
 					<Button onClick={submitForm} variant="contained" color="success">
 						Enregistrer

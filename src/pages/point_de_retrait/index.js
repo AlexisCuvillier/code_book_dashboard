@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Menu from "../components/Menu/menu";
+import Menu from "../../components/Menu/menu";
 import styles from "@/styles/Home.module.css";
+import { Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import Link from "next/link";
+
 
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
@@ -12,7 +16,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import AddBookModal from "@/components/Modals/addBookModal";
+import AddSelfServiceModal from "@/components/Modals/addSelfServiceModal";
+
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
 	[`&.${tableCellClasses.head}`]: {
@@ -34,69 +39,73 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 	},
 }));
 
-function createData(titre, auteur, disponible, etat) {
-	return { titre, auteur, disponible, etat };
+function createData(_id, location, address, zip_code, state) {
+	return { _id, location, address, zip_code, state};
 }
-export default function Books() {
+
+export default function Service() {
 	const [rows, setRows] = useState([]);
 
 	useEffect(() => {
-		async function fetchBooks() {
+		async function fetchSelfservice() {
 			try {
 				console.log();
-				const response = await fetch(`${process.env.API}/api/book`);
+				const response = await fetch(`${process.env.API}/api/selfService`);
 				const data = await response.json();
 				makeRows(data.result);
+				console.log(data);
 			} catch (error) {
 				console.error(error);
 			}
 		}
 
-		function makeRows(books) {
-			const rows = books.map((book) => {
-				const availableSign = book.available ? "🟢" : "🔴";
+		function makeRows(selfServices) {
+			const rows = selfServices.map((selfService) => {
 				const state = (
 					<div>
-						<EditIcon />
-						<DeleteOutlineIcon />
+						<Link href={`/books/edit/${selfService._id}`} className={styles.edit}>
+							<EditIcon />
+						</Link>
+						<Link href={`/books/remove/${selfService._id}`} className={styles.remove}>
+							<DeleteOutlineIcon />
+						</Link>
 					</div>
 				);
-				return createData(book.title, book.author, availableSign, state);
+				return createData(selfService._id, selfService.location, selfService.address, selfService.zip_code, state);
 			});
 			setRows(rows);
 		}
 
-		fetchBooks();
+		fetchSelfservice();
 	}, []);
 
 	return (
 		<div className={styles.container}>
 			<Menu />
 			<div className={styles.main}>
-				<h1>Liste des livres</h1>
+				<h1>Liste des points de retrait</h1>
 				<hr />
-				<AddBookModal />
+				<AddSelfServiceModal />
+
 				<TableContainer component={Paper}>
 					<Table sx={{ minWidth: 700 }} aria-label="customized table">
 						<TableHead>
 							<TableRow>
-								<StyledTableCell>Titre</StyledTableCell>
-								<StyledTableCell align="right">Auteur</StyledTableCell>
-								<StyledTableCell align="center">Disponible</StyledTableCell>
-								<StyledTableCell align="center">Etat</StyledTableCell>
+								<StyledTableCell>Id</StyledTableCell>
+								<StyledTableCell>Location</StyledTableCell>
+								<StyledTableCell>Adresse</StyledTableCell>
+								<StyledTableCell align="center">Code Postal</StyledTableCell>
+								<StyledTableCell></StyledTableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
 							{rows.map((row) => (
-								<StyledTableRow key={row.titre}>
-									<StyledTableCell component="th" scope="row">
-										{row.titre}
-									</StyledTableCell>
-									<StyledTableCell align="right">{row.auteur}</StyledTableCell>
-									<StyledTableCell align="center">
-										{row.disponible}
-									</StyledTableCell>
-									<StyledTableCell align="center">{row.etat}</StyledTableCell>
+								<StyledTableRow key={row._id}>
+									<StyledTableCell component="th" scope="row">{row._id}</StyledTableCell>
+									<StyledTableCell>{row.location}</StyledTableCell>
+									<StyledTableCell>{row.address}</StyledTableCell>
+									<StyledTableCell align="center">{row.zip_code}</StyledTableCell>
+									<StyledTableCell align="center">{row.state}</StyledTableCell>
 								</StyledTableRow>
 							))}
 						</TableBody>

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import React, { useState } from 'react'
-import styles from '../Dashboard/dashboard.module.css'
+import styles from './TopDashboard.module.css'
 
 export default function TopDashboard({ name }) {
   const admin = (name.user).replace(/['"]+/g, '')
