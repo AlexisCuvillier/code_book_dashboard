@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Menu from "../components/Menu/menu";
 import styles from "@/styles/Home.module.css";
 
@@ -10,8 +10,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import AddBookModal from "@/components/Modals/addBookModal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
 	[`&.${tableCellClasses.head}`]: {
@@ -33,26 +34,40 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 	},
 }));
 
-function createData(name, calories, fat, carbs, protein) {
-	return { name, calories, fat, carbs, protein };
+function createData(titre, auteur, disponible, etat) {
+	return { titre, auteur, disponible, etat };
 }
-
-const rows = [
-	createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-	createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-	createData("Eclair", 262, 16.0, 24, 6.0),
-	createData("Cupcake", 305, 3.7, 67, 4.3),
-	createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
-
-function submitForm() {
-	console.log("submit OK");
-}
-
 export default function Books() {
-	const [open, setOpen] = React.useState(false);
-	const handleOpen = () => setOpen(true);
-	const handleClose = () => setOpen(false);
+	const [rows, setRows] = useState([]);
+
+	useEffect(() => {
+		async function fetchBooks() {
+			try {
+				console.log();
+				const response = await fetch(`${process.env.API}/api/book`);
+				const data = await response.json();
+				makeRows(data.result);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+
+		function makeRows(books) {
+			const rows = books.map((book) => {
+				const availableSign = book.available ? "🟢" : "🔴";
+				const state = (
+					<div>
+						<EditIcon />
+						<DeleteOutlineIcon />
+					</div>
+				);
+				return createData(book.title, book.author, availableSign, state);
+			});
+			setRows(rows);
+		}
+
+		fetchBooks();
+	}, []);
 
 	return (
 		<div className={styles.container}>
@@ -60,71 +75,28 @@ export default function Books() {
 			<div className={styles.main}>
 				<h1>Liste des livres</h1>
 				<hr />
-				<div className={styles.addbutton}>
-					<Button onClick={handleOpen} variant="contained" color="secondary">
-						<AddIcon />
-						<span>Ajouter un livre</span>
-					</Button>
-					<Modal
-						open={open}
-						onClose={handleClose}
-						aria-labelledby="modal-modal-title"
-						aria-describedby="modal-modal-description"
-					>
-						<Box className={styles.modal}>
-							<Typography id="modal-modal-title" variant="h6" component="h2">
-								Ajouter
-							</Typography>
-							<TextField
-								className={styles.input}
-								autoFocus
-								margin="dense"
-								id="title"
-								label="Titre"
-								type="title"
-								variant="outlined"
-							/>
-							<TextField
-								className={styles.input}
-								autoFocus
-								margin="dense"
-								id="author"
-								label="Auteur"
-								type="author"
-								variant="outlined"
-							/>
-							<Button onClick={handleOpen} variant="contained" color="success">
-								Enregistrer
-							</Button>
-						</Box>
-					</Modal>
-				</div>
-
+				<AddBookModal />
 				<TableContainer component={Paper}>
 					<Table sx={{ minWidth: 700 }} aria-label="customized table">
 						<TableHead>
 							<TableRow>
-								<StyledTableCell>Dessert (100g serving)</StyledTableCell>
-								<StyledTableCell align="right">Calories</StyledTableCell>
-								<StyledTableCell align="right">Fat&nbsp;(g)</StyledTableCell>
-								<StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
-								<StyledTableCell align="right">
-									Protein&nbsp;(g)
-								</StyledTableCell>
+								<StyledTableCell>Titre</StyledTableCell>
+								<StyledTableCell align="right">Auteur</StyledTableCell>
+								<StyledTableCell align="center">Disponible</StyledTableCell>
+								<StyledTableCell align="center">Etat</StyledTableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
 							{rows.map((row) => (
-								<StyledTableRow key={row.name}>
+								<StyledTableRow key={row.titre}>
 									<StyledTableCell component="th" scope="row">
-										{row.name}
+										{row.titre}
 									</StyledTableCell>
-									<StyledTableCell align="right">
-										{row.calories}
+									<StyledTableCell align="right">{row.auteur}</StyledTableCell>
+									<StyledTableCell align="center">
+										{row.disponible}
 									</StyledTableCell>
-									<StyledTableCell align="right">{row.fat}</StyledTableCell>
-									<StyledTableCell align="right">{row.carbs}</StyledTableCell>
-									<StyledTableCell align="right">{row.protein}</StyledTableCell>
+									<StyledTableCell align="center">{row.etat}</StyledTableCell>
 								</StyledTableRow>
 							))}
 						</TableBody>

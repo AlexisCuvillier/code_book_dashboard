@@ -1,7 +1,8 @@
 .top {
     display: flex;
-    width: 80%;
+    padding: 10em;
     height: 25rem;
+    width: -webkit-fill-available;
     align-items: center;
     justify-content: space-evenly;
     background-color: #01015c;
@@ -10,4 +11,8 @@
 .top p {
     font-size: 2.5em;
     color: #fff;
+}
+
+.welcome {
+    padding: 2em;
 }

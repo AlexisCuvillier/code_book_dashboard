@@ -1,36 +1,81 @@
-import Typography from "@mui/material/Typography";
-import CssBaseline from '@mui/material/CssBaseline';
-import { TextField, FormControlLabel, Checkbox, Button, Paper, Grid, Box } from "@mui/material";
+import { useState, useEffect } from "react";
+import { useCookies } from "react-cookie";
+import {
+	TextField,
+	Paper,
+	Grid,
+	Box,
+	Typography,
+	Button,
+} from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import Menu from "@/components/Menu/menu";
 
 const theme = createTheme();
 
-export default function connexion() {
-	async function login(e) {
-		e.preventDefault();
-		console.log("connexion");
-		const donne = await axios.post(`${process.env.api}api/auth/login`, {
-			email: "",
-			password: "",
-		});
-
-		console.log(donne.data);
+export default function Connexion() {
+	const [cookie, setCookie, removeCookie] = useCookies(["user"]);
+	const router = useRouter();
+	const [name, setname] = useState("Brigitte");
+	const [code, setCode] = useState("JI34NF32");
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState(null);
+	
+	if(cookie) {
+		<Menu removeCookie={removeCookie} />
 	}
+
+	useEffect(() => {
+		if (cookie.user) {
+			router.push("/");
+		}
+	}, [cookie, router]);
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		setIsLoading(true);
+		setError(null);
+		const url = `${process.env.API}/api/login`;
+		fetch(url, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ name, code }),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data);
+				if (data.message === "Logged In") {
+					setCookie("user", name, {
+						path: "/",
+						maxAge: 3600, // Expires after 1hr
+						sameSite: true,
+					});
+					router.push("/");
+				} else {
+					setError("name ou mot de passe incorrect");
+				}
+				setIsLoading(false);
+			})
+			.catch((error) => {
+				console.error(error);
+				setError("Une erreur s'est produite, veuillez réessayer plus tard");
+				setIsLoading(false);
+				return error;
+			});
+	};
 
 	return (
 		<ThemeProvider theme={theme}>
 			<Grid container component="main" sx={{ height: "100vh" }}>
-				<CssBaseline />
 				<Grid
 					item
 					xs={false}
 					sm={4}
 					md={7}
 					sx={{
-						backgroundImage:
-							'url("./image/reading-book-sunny-park.jpg")',
+						backgroundImage: 'url("./image/reading-book-sunny-park.jpg")',
 						backgroundRepeat: "no-repeat",
 						backgroundColor: (t) =>
 							t.palette.mode === "light"
@@ -51,9 +96,10 @@ export default function connexion() {
 						}}
 					>
 						<Image
-						src="/image/CodeBook.png" 
-						width={300}
-						height={300}
+							src="/image/CodeBook.png"
+							alt="CodeBook logo"
+							width={300}
+							height={300}
 						/>
 						<Typography component="h1" variant="h5">
 							<bold>Connexion</bold>
@@ -63,32 +109,28 @@ export default function connexion() {
 								margin="normal"
 								required
 								fullWidth
-								id="email"
-								label="Email"
-								name="email"
-								autoComplete="email"
+								id="name"
+								label="Nom"
+								name="name"
+								autoComplete="name"
 								autoFocus
 							/>
 							<TextField
 								margin="normal"
 								required
 								fullWidth
-								name="password"
-								label="Mot de passe"
-								type="password"
-								id="password"
-								autoComplete="current-password"
-							/>
-							<FormControlLabel
-								control={<Checkbox value="remember" color="primary" />}
-								label="Se souvenir de moi"
+								name="code"
+								label="Code"
+								type="code"
+								id="code"
+								autoComplete="current-code"
 							/>
 							<Button
 								type="submit"
 								fullWidth
 								variant="contained"
 								sx={{ mt: 3, mb: 2 }}
-								onClick={login}
+								onClick={handleSubmit}
 							>
 								Connexion
 							</Button>
